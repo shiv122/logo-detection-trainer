@@ -236,3 +236,4 @@ This guide includes:
 
 This training pipeline is specifically designed for the challenges of sports logo detection and should provide excellent results for logos on boards, screens, jerseys, and other sports surfaces.
 # logo-detection-trainer
+# logo-detection-trainer

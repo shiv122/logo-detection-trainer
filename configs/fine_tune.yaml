@@ -1,0 +1,281 @@
+# Fine-tuning Configuration for YOLO v11 Sports Logo Detection
+# This stage refines the base model for optimal sports logo detection performance
+
+# Model Configuration
+model:
+  # Use the best model from base training as starting point
+  # Why best model? Better starting weights for fine-tuning
+  # For sports logos: Base model has learned diverse logo patterns
+  name: "runs/base_training/sports_logo_detection/base_training/weights/best.pt"
+  
+  # Freeze backbone layers for initial fine-tuning
+  # Why freeze? Prevents catastrophic forgetting, focuses on task-specific layers
+  # Sports logos: Preserve general object detection patterns while adapting to logos
+  freeze_backbone: true
+
+# Dataset Configuration
+data:
+  # Same dataset as base training
+  path: "../yolo_dataset_v11/dataset.yaml"
+  
+  # Use all classes (10 brands)
+  nc: 10
+  
+  # Class names for our brands
+  names:
+    0: bundaberg
+    1: chemist_warehouse
+    2: harvey_norman
+    3: kfc
+    4: kia
+    5: steeden
+    6: telstra
+    7: westpac
+    8: witzer
+    9: youi
+
+# Training Configuration - Optimized for Sports Logo Fine-tuning
+training:
+  # Fine-tuning epochs - focused refinement for sports logos
+  # Why 40? Sports logos need more refinement due to extreme variability
+  # Longer fine-tuning for complex sports environments
+  epochs: 40
+  
+  # Batch size - optimized for fine-tuning with frozen backbone
+  # Why 36? Larger batch possible due to frozen backbone
+  # More stable gradients for sports logo refinement
+  batch_size: 36
+  
+  # Image size - same as base training for consistency
+  # Why 832? Maintains high resolution for small logo detection
+  # Consistency with base training for optimal fine-tuning
+  imgsz: 832
+  
+  # Learning rate - very low for precise fine-tuning
+  # Why 0.0005? Sports logos need very precise adjustments
+  # Very low LR prevents disrupting learned sports logo patterns
+  lr0: 0.0005
+  
+  # Final learning rate - extremely low for precision
+  # Why 0.00005? Very gradual convergence for sports logo precision
+  # Extremely low final LR for precise logo detection
+  lrf: 0.00005
+  
+  # Learning rate scheduler - cosine annealing
+  # Why cosine? Smooth decay, good for fine-tuning complex patterns
+  scheduler: "cosine"
+  
+  # Weight decay - minimal for fine-tuning
+  # Why 0.0001? Minimal regularization to preserve learned features
+  # Very low weight decay for sports logo fine-tuning
+  weight_decay: 0.0001
+  
+  # Momentum - same as base training
+  # Why 0.937? Consistent with base training
+  momentum: 0.937
+  
+  # Warmup epochs - shorter warmup for fine-tuning
+  # Why 2? Quick warmup for fine-tuning
+  warmup_epochs: 2
+  
+  # Warmup momentum - same as base
+  warmup_momentum: 0.8
+  
+  # Warmup bias - same as base
+  warmup_bias_lr: 0.1
+
+# Augmentation Configuration - Highly Aggressive for Sports Environment
+augmentation:
+  # HSV hue - more color variation for sports lighting
+  # Why 0.03? Sports venues have extreme lighting variations
+  # Higher hue variation for diverse sports lighting conditions
+  hsv_h: 0.03
+  
+  # HSV saturation - aggressive color variation
+  # Why 0.9? Logos appear on various surfaces with different color properties
+  # Very high saturation variation for sports logo diversity
+  hsv_s: 0.9
+  
+  # HSV value - extreme brightness variation
+  # Why 0.6? Sports venues range from bright sunlight to dim indoor lighting
+  # Very high value variation for lighting diversity
+  hsv_v: 0.6
+  
+  # Degrees rotation - higher rotation for sports viewing angles
+  # Why 20.0? Sports logos viewed from extreme angles (high/low, side views)
+  # Higher rotation tolerance for sports viewing angles
+  degrees: 20.0
+  
+  # Translation - aggressive position variation
+  # Why 0.25? Logos appear anywhere in sports environments
+  # Very high translation for diverse logo positions
+  translate: 0.25
+  
+  # Scale - extreme size variation for sports logos
+  # Why 0.8? Logos range from tiny jersey patches to massive billboards
+  # Very high scale variation for sports logo size diversity
+  scale: 0.8
+  
+  # Shear - higher distortion for sports perspectives
+  # Why 8.0? Sports logos viewed from extreme perspectives
+  # Higher shear for sports viewing angles
+  shear: 8.0
+  
+  # Perspective - higher perspective changes
+  # Why 0.003? Sports logos viewed from various camera angles
+  # Higher perspective for sports camera angles
+  perspective: 0.003
+  
+  # Flip up-down - still disabled for logos
+  # Why 0.0? Logos should remain right-side up
+  flipud: 0.0
+  
+  # Flip left-right - enabled for mirroring
+  # Why 0.5? Logos can be mirrored in sports environments
+  fliplr: 0.5
+  
+  # Mosaic - enabled for diversity
+  # Why 1.0? Increases effective batch size and diversity
+  # Essential for sports logo fine-tuning
+  mosaic: 1.0
+  
+  # Mixup - aggressive blending for sports robustness
+  # Why 0.2? Helps with generalization for diverse sports environments
+  # Higher mixup for sports logo robustness
+  mixup: 0.2
+  
+  # Copy paste - aggressive object copying
+  # Why 0.2? Helps with logo diversity and positioning
+  # Higher copy paste for sports logo variety
+  copy_paste: 0.2
+
+# Loss Configuration - Optimized for Sports Logo Fine-tuning
+loss:
+  # Box loss gain - higher precision for sports logos
+  # Why 0.08? Sports logos need very precise bounding boxes
+  # Higher box loss for sports logo precision
+  box: 0.08
+  
+  # Classification loss gain - higher for logo identification
+  # Why 0.7? Sports logos need strong classification
+  # Higher classification weight for sports logo identification
+  cls: 0.7
+  
+  # DFL loss gain - higher for small logo detection
+  # Why 2.0? Essential for small sports logo detection
+  # Very high DFL for small logo detection in sports
+  dfl: 2.0
+  
+  # Pose loss gain - not used
+  pose: 0.0
+  
+  # Keypoint loss gain - not used
+  kobj: 0.0
+  
+  # Label smoothing - higher for sports logo robustness
+  # Why 0.1? Sports logos have extreme variability
+  # Higher smoothing for sports logo robustness
+  label_smoothing: 0.1
+
+# Validation Configuration
+validation:
+  # Validation frequency - every epoch
+  # Why 1? Regular monitoring
+  val: true
+  
+  # Save best model based on mAP
+  # Why mAP? Best metric for object detection
+  save_period: -1
+
+# Output Configuration
+output:
+  # Project name for organization
+  project: "sports_logo_detection"
+  
+  # Experiment name for this run
+  name: "fine_tune"
+  
+  # Save directory
+  save_dir: "runs/fine_tune"
+  
+  # Save best model
+  save: true
+  
+  # Save last model
+  save_last: true
+  
+  # Save period - save every 5 epochs
+  # Why 5? More frequent saving for fine-tuning
+  save_period: 5
+
+# Device Configuration
+device:
+  # Use GPU if available
+  device: "auto"
+  
+  # Number of workers - more due to frozen backbone
+  # Why 16? More workers possible due to frozen backbone
+  # Higher worker count for faster data loading
+  workers: 16
+
+# Logging Configuration
+logging:
+  # Use TensorBoard for visualization
+  # Why TensorBoard? Industry standard for ML logging
+  tensorboard: true
+  
+  # Log images - useful for debugging
+  # Why true? Helps visualize fine-tuning progress
+  plots: true
+  
+  # Save confusion matrix
+  # Why true? Helps understand class performance
+  confusion_matrix: true
+  
+  # Save validation predictions
+  # Why true? Helps analyze model predictions
+  save_val_predictions: true
+
+# Advanced Fine-tuning Configuration - Sports Optimized
+advanced:
+  # Unfreeze backbone after initial training
+  # Why unfreeze? Allows full model optimization for sports logos
+  # Unfreeze at 20 epochs for full sports logo optimization
+  unfreeze_backbone_epoch: 20
+  
+  # Learning rate multiplier for unfrozen layers
+  # Why 0.05? Very low learning rate for backbone
+  # Very low LR multiplier to preserve general patterns
+  backbone_lr_multiplier: 0.05
+  
+  # Early stopping patience
+  # Why 15? Longer patience for sports logo fine-tuning
+  # More patience due to sports logo complexity
+  patience: 15
+  
+  # Minimum improvement for early stopping
+  # Why 0.0005? Smaller improvement threshold for precision
+  # Smaller threshold for sports logo precision
+  min_delta: 0.0005
+
+# Sports-Specific Fine-tuning Configuration
+sports_fine_tuning:
+  # Multi-scale validation - test on different scales
+  # Why enabled? Sports logos appear at various scales
+  multi_scale_validation: true
+  
+  # Test time augmentation - improve inference
+  # Why enabled? Sports logos benefit from TTA
+  test_time_augmentation: true
+  
+  # Focus on small object detection
+  # Why enabled? Many sports logos are small
+  small_object_optimization: true
+  
+  # Motion blur simulation - for sports action
+  # Why enabled? Sports logos often have motion blur
+  motion_blur_simulation: true
+  
+  # Lighting variation focus - for sports venues
+  # Why enabled? Sports venues have extreme lighting
+  lighting_variation_focus: true

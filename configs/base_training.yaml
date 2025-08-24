@@ -1,0 +1,246 @@
+# Base Training Configuration for YOLO v11 Sports Logo Detection
+# This stage focuses on learning fundamental object detection patterns for logos in sports environments
+
+# Model Configuration
+model:
+  # Use YOLOv11n (nano) for base training - smaller, faster, good for initial learning
+  # Why nano? Faster training, less memory usage, good baseline performance
+  # For sports logos: We need speed for real-time detection during events
+  name: "yolov11n"
+  
+  # Pre-trained weights from COCO dataset
+  # Why pre-trained? Transfer learning from general object detection to logo detection
+  # Sports logos benefit from general object detection patterns learned on COCO
+  pretrained: true
+
+# Dataset Configuration
+data:
+  # Path to our custom dataset
+  path: "../yolo_dataset_v11/dataset.yaml"
+  
+  # Use all classes (10 brands)
+  nc: 10
+  
+  # Class names for our brands
+  names:
+    0: bundaberg
+    1: chemist_warehouse
+    2: harvey_norman
+    3: kfc
+    4: kia
+    5: steeden
+    6: telstra
+    7: westpac
+    8: witzer
+    9: youi
+
+# Training Configuration - Optimized for Sports Logo Detection
+training:
+  # Base training epochs - moderate for initial learning
+  # Why 60? Sports logos have high variability (boards, jerseys, screens, angles)
+  # Need more epochs to learn diverse logo appearances
+  epochs: 60
+  
+  # Batch size - balanced for sports logo complexity
+  # Why 20? Sports logos vary greatly in size and position
+  # Larger batch helps with diverse logo patterns
+  batch_size: 20
+  
+  # Image size - higher resolution for small logos
+  # Why 832? Sports logos can be very small (jersey patches, distant boards)
+  # Higher resolution helps detect small logos
+  imgsz: 832
+  
+  # Learning rate - conservative for sports logo complexity
+  # Why 0.008? Sports logos appear in various conditions (motion blur, lighting)
+  # Conservative LR prevents overshooting on complex patterns
+  lr0: 0.008
+  
+  # Final learning rate - gradual decrease
+  # Why 0.0008? Smooth convergence for diverse logo appearances
+  lrf: 0.0008
+  
+  # Learning rate scheduler - cosine annealing
+  # Why cosine? Smooth learning rate decay, better convergence for complex patterns
+  scheduler: "cosine"
+  
+  # Weight decay - moderate regularization
+  # Why 0.0003? Prevents overfitting without being too aggressive
+  # Sports logos need some regularization due to high variability
+  weight_decay: 0.0003
+  
+  # Momentum - standard value
+  # Why 0.937? Good for gradient descent stability
+  momentum: 0.937
+  
+  # Warmup epochs - gradual start
+  # Why 5? Sports logos need more warmup due to complexity
+  warmup_epochs: 5
+  
+  # Warmup momentum - gradual increase
+  # Why 0.8? Smooth momentum increase
+  warmup_momentum: 0.8
+  
+  # Warmup bias - gradual bias initialization
+  # Why 0.1? Prevents bias explosion
+  warmup_bias_lr: 0.1
+
+# Augmentation Configuration - Optimized for Sports Environment
+augmentation:
+  # HSV hue - moderate color variation for different lighting
+  # Why 0.025? Sports venues have varied lighting (indoor/outdoor, floodlights)
+  # Moderate hue change simulates different lighting conditions
+  hsv_h: 0.025
+  
+  # HSV saturation - color variation for different displays
+  # Why 0.8? Logos appear on screens, boards, jerseys with different color saturation
+  # Higher saturation variation for diverse display conditions
+  hsv_s: 0.8
+  
+  # HSV value - brightness variation for different lighting
+  # Why 0.5? Sports venues have extreme lighting variations (bright sun to dim indoor)
+  # Higher value variation for lighting diversity
+  hsv_v: 0.5
+  
+  # Degrees rotation - moderate rotation for different viewing angles
+  # Why 15.0? Logos appear at various angles (boards, jerseys, screens)
+  # Moderate rotation tolerance for real-world viewing angles
+  degrees: 15.0
+  
+  # Translation - position variation for different logo placements
+  # Why 0.2? Logos appear anywhere (boards, jerseys, screens, banners)
+  # Higher translation for diverse logo positions
+  translate: 0.2
+  
+  # Scale - size variation for different distances and logo sizes
+  # Why 0.7? Logos vary greatly in size (small jersey patches to large billboards)
+  # Higher scale variation for size diversity
+  scale: 0.7
+  
+  # Shear - slight distortion for perspective changes
+  # Why 5.0? Logos viewed from different angles (side view, perspective)
+  # Moderate shear for perspective variations
+  shear: 5.0
+  
+  # Perspective - perspective changes for different viewing angles
+  # Why 0.002? Logos viewed from various angles (high/low, side angles)
+  # Moderate perspective for viewing angle diversity
+  perspective: 0.002
+  
+  # Flip up-down - disabled for logos
+  # Why 0.0? Logos should remain right-side up
+  flipud: 0.0
+  
+  # Flip left-right - enabled for mirroring
+  # Why 0.5? Logos can be mirrored (jerseys, some boards)
+  fliplr: 0.5
+  
+  # Mosaic - combines multiple images
+  # Why 1.0? Increases effective batch size and diversity
+  # Essential for sports logos due to high variability
+  mosaic: 1.0
+  
+  # Mixup - blends images for robustness
+  # Why 0.1? Helps with generalization for diverse logo appearances
+  # Moderate mixup for sports logo complexity
+  mixup: 0.1
+  
+  # Copy paste - copies objects between images
+  # Why 0.1? Helps with logo diversity and positioning
+  # Moderate copy paste for logo variety
+  copy_paste: 0.1
+
+# Loss Configuration - Optimized for Sports Logo Detection
+loss:
+  # Box loss gain - bounding box regression
+  # Why 0.06? Sports logos need precise bounding boxes for accurate detection
+  # Slightly higher for precision in complex environments
+  box: 0.06
+  
+  # Classification loss gain
+  # Why 0.6? Higher classification weight for logo identification
+  # Sports logos need strong classification due to similar appearances
+  cls: 0.6
+  
+  # DFL loss gain - distribution focal loss
+  # Why 1.8? Helps with class imbalance and small logo detection
+  # Higher DFL for better small logo detection
+  dfl: 1.8
+  
+  # Pose loss gain - not used for object detection
+  pose: 0.0
+  
+  # Keypoint loss gain - not used for object detection
+  kobj: 0.0
+  
+  # Label smoothing - prevents overconfidence
+  # Why 0.05? Sports logos have high variability, prevents overconfidence
+  # Moderate smoothing for logo detection robustness
+  label_smoothing: 0.05
+
+# Validation Configuration
+validation:
+  # Validation frequency - every epoch
+  # Why 1? Regular monitoring of performance
+  val: true
+  
+  # Save best model based on mAP
+  # Why mAP? Best metric for object detection
+  save_period: -1
+
+# Output Configuration
+output:
+  # Project name for organization
+  project: "sports_logo_detection"
+  
+  # Experiment name for this run
+  name: "base_training"
+  
+  # Save directory
+  save_dir: "runs/base_training"
+  
+  # Save best model
+  save: true
+  
+  # Save last model
+  save_last: true
+  
+  # Save period - save every 10 epochs
+  save_period: 10
+
+# Device Configuration
+device:
+  # Use GPU if available
+  device: "auto"
+  
+  # Number of workers for data loading
+  # Why 12? Sports logo detection needs more workers due to complex augmentations
+  workers: 12
+
+# Logging Configuration
+logging:
+  # Use TensorBoard for visualization
+  # Why TensorBoard? Industry standard for ML logging
+  tensorboard: true
+  
+  # Log images - useful for debugging
+  # Why true? Helps visualize training progress
+  plots: true
+  
+  # Save confusion matrix
+  # Why true? Helps understand class performance
+  confusion_matrix: true
+
+# Sports-Specific Configuration
+sports_optimization:
+  # Multi-scale training - helps with different logo sizes
+  # Why enabled? Logos appear at various scales (small jerseys to large billboards)
+  multi_scale: true
+  
+  # Anchor optimization - for sports logo aspect ratios
+  # Why enabled? Sports logos have specific aspect ratios
+  anchor_optimization: true
+  
+  # Focus on small object detection
+  # Why enabled? Many sports logos are small (jersey patches, distant boards)
+  small_object_focus: true
